@@ -1,0 +1,19 @@
+# ignore repo from Prof. Kwitt
+slides/
+#ignore pdfs in VL slides
+VL_ML/**/*.pdf
+## Core latex/pdflatex auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+*.synctex
+*.synctex.gz
