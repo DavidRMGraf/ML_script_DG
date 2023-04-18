@@ -2,13 +2,14 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
-\usepackage{xcolor}
+\usepackage[usenames, dvipsnames]{xcolor}
 \usepackage{float}
 \usepackage{mathtools}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amsthm}
 \usepackage{thmtools}
+\usepackage{enumitem}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[part]
 \newtheorem{subdefinition}{Definition}[definition]
@@ -133,5 +134,76 @@ So, to conclude:
 	&= |H_{\mathrm{\textbf{bad}}}| \cdot e^{-\varepsilon m} \\
 	&\leq |H| \cdot e^{-\varepsilon m}
 \end{align*}
+This is a probabilistic guarantee that tells us how the generalization error scales with the sample size. If we increase m, ew can make $\varepsilon$ arbitrarily small. 
+If we let $ |H| \cdot e^{-\varepsilon m} <\delta \in (0,1)$ and solve for $m$, we get 
+$$ m>\frac{1}{\underbrace{\colorbox{orange}{$\varepsilon$}}_{error}} \cdot \log \Big(\frac{|H|}{\underbrace{\colorbox{orange}{$\delta$}}_{confidence}}\Big)$$
+\paragraph{Corollary:} Let $|H| < \infty$ and $\varepsilon, \delta \in (0,1)$. Let $m$ be an integer (the sample size) such that $\color{red} m>\frac{1}{\varepsilon} \cdot log \big(\frac{|H|}{\delta}\big)$. Then, for each labeling function $f: X \to Y$ and any distribution $\mathcal{D}$ over domain $X$ (for which realizability holds), we have that with probability of at least $1-f$ over the choice of $S|_x$ (of size m) it holds that every ERM hypothesis $h_s$ satisfies the following:
+$$ L_{\mathcal{D},f} \leq \varepsilon $$
+
+\textcolor{red}{\paragraph{Interpretation:} For sufficiently large $m, ERM_H$ returns $h_S$ (i.e., a hypothesis) that is \textbf{P}ROBABLY \textbf{A}PPROXIMATELY \textbf{C}ORRECT (PAC).}\\
+\newline
+This leads to:
+\begin{boxeddef}[PAC learnability]
+	A hypothesis class $H$ is \textcolor{red}{PAC learnable}, if there exists a function $m_H: (0,1)^2 \to \mathbb{N}$ and a learning algorithm $\mathcal{A}$ with the following properties:
+	\begin{enumerate}
+		\item for every $\varepsilon, \delta \in (0,1)$ and
+		\item every distribution $\mathcal{D}$ over domain $\mathcal{X}$ and
+		\item every labelling function $f: X \to \{0, 1\}$ if
+		\item realizability holds (w.r.t. to $\mathcal{D}, H, f$) then
+	\end{enumerate}
+	running $\mathcal{A}$ on $m \geq m_H(\varepsilon, \delta)$ \textit{iid.} instances drawn from $\mathcal{D}$ and labelled by $f$, returns a hypothesis $h$ such that with probability of at least $1-\delta$ (over choice of S) 
+	$$ L_{\mathcal{D}, f} \leq \varepsilon $$
+\end{boxeddef}
+\begin{boxedsubdef}[Sample complexity]
+	$m_H: \{0,1\} \to \mathbb{N}$ is called the \textcolor{red}{sample complexity} function. In particular, $m_H$ returns the smallest integer such that the requirements for PAC-learnability are satisfied
+\end{boxedsubdef}
+We have already seen that \textcolor{red}{finite hypothesis classes} ($|H| < \infty$) \textcolor{red}{are PAC learnable} with 
+$$ m_H(\varepsilon, \delta) \leq \bigg\lceil\frac{1}{\varepsilon} \cdot log \bigg( \frac{|H|}{\delta}\bigg) \bigg\rceil $$
+
+We will now move to a more general setting.
+\begin{enumerate}[label*=\protect\fbox{\arabic{enumi}}]
+	\item We will first release the realizability assumption (In this setting, the best we can hope for are guarantees relative to the "best" possible hypothesis in the class: $$\min_{h \in H}{L_{\mathcal{D}, f}(h)}$$
+\end{enumerate}
+	\begin{boxeddef}[Höffding inequality]
+	Let $X_1, ..., X_m$ be \textit{iid} random variables taking values in $[a_i, b_i]$ for $i \in [m]$. Then, it holds that
+	 \begin{align*}
+	 	\mathbb{P}\bigg[S_m - \mathbb{E}[S_m] > \varepsilon\bigg] &\leq e^{\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}} && , S_m = \sum_{i = 1}^{m} X_i, &&& \text{and}\\
+	 	\mathbb{P}\bigg[S_m - \mathbb{E}[S_m] < -\varepsilon\bigg] &\leq e^{\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}} 
+	\end{align*}
+	Also:
+	\begin{align*}
+	 	\mathbb{P}\bigg[\big|S_m - \mathbb{E}[S_m]\big| > \varepsilon\bigg] &\leq 2 \cdot e^{\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}}\\
+	 	HIER NOTIZ EINFÜGEN
+	 \end{align*}
+
+\end{boxeddef}
+Another useful form of this inequality is:
+$$ \mathbb{P} \bigg[\bigg| \frac{1}{m} \cdot \sum_{i = 1}^{m} X_i - \mu ]\bigg| \geq \varepsilon\bigg] \leq 2 \cdot e^{\frac{-2 \varepsilon^2 m}{b-a}} $$
+with $\mu = \mathbb{E}[X_i]$ and $\mathbb{P}[a \leq X_i \leq b] = 1$ for all $i \in [m]$. As a consequence, we can say the following: fix $\varepsilon>0$; then for any \colorbox{Apricot}{\underline{single} $h: X \to Y$}, we have 
+$$ \mathbb{P}_{S|_x \sim \mathcal{D}^m}\bigg[\big|L_{s}(h) - L_{\mathcal{D}, f}\big| > \varepsilon\bigg] \leq 2 e^{-2\varepsilon^2 m} \hspace{1cm} (a = 0, b = 1)$$
+If we would set $2^{-2 \varepsilon^2 m} = \delta$, and solve for $\varepsilon$, we would get
+$$ \varepsilon = \sqrt{\frac{log\big(\frac{2}{\delta}\big)}{2m}} $$
+$\implies L_{\mathcal{D},f}(h) \leq L_{s}(h) + \sqrt{\frac{log\big(\frac{2}{\delta}\big)}{2m}} $ (holds with probabilty of at least $1-\delta$ over choice of S)
+\paragraph{Remark:} This result holds for a \underline{single} h. However, we can easily get a bound that holds \underline{uniformly} for all $h \in H, |H| < \infty$
+$$ \mathbb{P}_{S|_x \sim \mathcal{D}^m} \bigg[\exists h \in H: \big|L_{s}(H) - L_{\mathcal{D}, f}(h) \big| > \varepsilon \bigg] \leq \sum_{h \in H} 2\cdot e^{-2 \varepsilon^2 m} \leq 2 \big|H\big| \cdot e^{-2 \varepsilon^2 m} $$ 
+We will see that we did need realizability for that!
+
+\begin{enumerate}
+	\item[\protect\fbox{2}] Next, we release our requirement of a "true" labelling function $f$. We do this by letting $\mathcal{D}$ be a distribution over $X x Y = Z$. We need to adjust our definitions of empirical error and generalization error:
+	\begin{eqnarray}
+		L_{\mathcal{D}}(h) = \mathbb{P}_{(x, y) \sim \mathcal{D}}
+	\end{eqnarray}
+\end{enumerate}
+Both \protect\fbox{1} and \protect\fbox{2} lead to:
+\begin{boxeddef}[Agnostic PAC learnability]
+	A hypothesis class $H$ is \textcolor{red}{agnostic PAC learnable}, if there exists a function $m_H: (0,1)^2 \to \mathbb{N}$ and a learning algorithm $\mathcal{A}$ with the following properties:
+	\begin{enumerate}
+		\item for every $\varepsilon, \delta \in (0,1)$ and
+		\item every distribution $\mathcal{D}$ over domain $\mathcal{X}\cdotp \mathcal{Y}$
+	\end{enumerate}
+	running $\mathcal{A}$ on $m \geq m_H(\varepsilon, \delta)$ \textit{iid.} instances drawn from $\mathcal{D}$, returns a hypothesis $h$ such that with probability of at least $1-\delta$ (over choice of S) 
+	$$ L_{\mathcal{D}}(h) \leq \min_{h' \in H} L_{\mathcal{D}}(h') + \varepsilon$$
+\end{boxeddef}
+
 
 \end{document}
