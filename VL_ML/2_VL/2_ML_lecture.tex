@@ -167,8 +167,8 @@ We will now move to a more general setting.
 	\begin{boxeddef}[Höffding inequality]
 	Let $X_1, ..., X_m$ be \textit{iid} random variables taking values in $[a_i, b_i]$ for $i \in [m]$. Then, it holds that
 	 \begin{align*}
-	 	\mathbb{P}\bigg[S_m - \mathbb{E}[S_m] > \varepsilon\bigg] &\leq e^{\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}} && , S_m = \sum_{i = 1}^{m} X_i, &&& \text{and}\\
-	 	\mathbb{P}\bigg[S_m - \mathbb{E}[S_m] < -\varepsilon\bigg] &\leq e^{\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}} 
+	 	\mathbb{P}\left[S_m - \mathbb{E}[S_m] > \varepsilon\right] &\leq e^{\left(\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}\right)} && ; S_m = \sum_{i = 1}^{m} X_i, \text{ and}\\
+	 	\mathbb{P}\left[S_m - \mathbb{E}[S_m] < -\varepsilon\right] &\leq e^{\left(\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}\right)} 
 	\end{align*}
 	Also:
 	\begin{align*}
@@ -178,12 +178,15 @@ We will now move to a more general setting.
 
 \end{boxeddef}
 Another useful form of this inequality is:
-$$ \mathbb{P} \bigg[\bigg| \frac{1}{m} \cdot \sum_{i = 1}^{m} X_i - \mu ]\bigg| \geq \varepsilon\bigg] \leq 2 \cdot e^{\frac{-2 \varepsilon^2 m}{b-a}} $$
+$$ \mathbb{P} \left[\left| \frac{1}{m} \cdot \sum_{i = 1}^{m} X_i - \mu \right| \geq \varepsilon\right] \leq 2 \cdot e^{\frac{-2 \varepsilon^2 m}{b-a}} $$
 with $\mu = \mathbb{E}[X_i]$ and $\mathbb{P}[a \leq X_i \leq b] = 1$ for all $i \in [m]$. As a consequence, we can say the following: fix $\varepsilon>0$; then for any \colorbox{Apricot}{\underline{single} $h: X \to Y$}, we have 
-$$ \mathbb{P}_{S|_x \sim \mathcal{D}^m}\bigg[\big|L_{s}(h) - L_{\mathcal{D}, f}\big| > \varepsilon\bigg] \leq 2 e^{-2\varepsilon^2 m} \hspace{1cm} (a = 0, b = 1)$$
-If we would set $2^{-2 \varepsilon^2 m} = \delta$, and solve for $\varepsilon$, we would get
-$$ \varepsilon = \sqrt{\frac{log\big(\frac{2}{\delta}\big)}{2m}} $$
-$\implies L_{\mathcal{D},f}(h) \leq L_{s}(h) + \sqrt{\frac{log\big(\frac{2}{\delta}\big)}{2m}} $ (holds with probabilty of at least $1-\delta$ over choice of S)
+$$ \mathbb{P}_{S|_x \sim \mathcal{D}^m}\left[\left|L_{s}(h) - L_{\mathcal{D}, f}\right| > \varepsilon\right] \leq 2 e^{-2\varepsilon^2 m} \hspace{1cm} (a = 0, b = 1)$$
+If we would set $\delta = 2^{-2 \varepsilon^2 m}$, and solve for $\varepsilon$, we would get
+\begin{align*}
+\varepsilon &= \sqrt{\frac{log\big(\frac{2}{\delta}\big)}{2m}}\\
+\implies L_{\mathcal{D},f}(h) &\leq L_{s}(h) + \sqrt{\frac{log\big(\frac{2}{\delta}\big)}{2m}}\\
+\text{\textcolor{red}{(holds with probabilty of }} & \text{\textcolor{red}{at least $1-\delta$ over choice of S)}}
+\end{align*}
 \paragraph{Remark:} This result holds for a \underline{single} h. However, we can easily get a bound that holds \underline{uniformly} for all $h \in H, |H| < \infty$
 $$ \mathbb{P}_{S|_x \sim \mathcal{D}^m} \bigg[\exists h \in H: \big|L_{s}(H) - L_{\mathcal{D}, f}(h) \big| > \varepsilon \bigg] \leq \sum_{h \in H} 2\cdot e^{-2 \varepsilon^2 m} \leq 2 \big|H\big| \cdot e^{-2 \varepsilon^2 m} $$ 
 We will see that we did need realizability for that!
@@ -199,11 +202,13 @@ Both \protect\fbox{1} and \protect\fbox{2} lead to:
 	A hypothesis class $H$ is \textcolor{red}{agnostic PAC learnable}, if there exists a function $m_H: (0,1)^2 \to \mathbb{N}$ and a learning algorithm $\mathcal{A}$ with the following properties:
 	\begin{enumerate}
 		\item for every $\varepsilon, \delta \in (0,1)$ and
-		\item every distribution $\mathcal{D}$ over domain $\mathcal{X}\cdotp \mathcal{Y}$
+		\item every distribution $\mathcal{D}$ over domain $\mathcal{X} \times \mathcal{Y}$
 	\end{enumerate}
 	running $\mathcal{A}$ on $m \geq m_H(\varepsilon, \delta)$ \textit{iid.} instances drawn from $\mathcal{D}$, returns a hypothesis $h$ such that with probability of at least $1-\delta$ (over choice of S) 
 	$$ L_{\mathcal{D}}(h) \leq \min_{h' \in H} L_{\mathcal{D}}(h') + \varepsilon$$
 \end{boxeddef}
+
+
 
 
 \end{document}
