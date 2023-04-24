@@ -2,6 +2,8 @@
 slides/
 #ignore pdfs in VL slides
 VL_ML/**/*.pdf
+# ignore PS scripts
+PS_ML/**/*.xopp
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
