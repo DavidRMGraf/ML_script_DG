@@ -192,7 +192,7 @@ $$ \mathbb{P}_{S|_x \sim \mathcal{D}^m} \bigg[\exists h \in H: \big|L_{s}(H) - L
 We will see that we did need realizability for that!
 
 \begin{enumerate}
-	\item[\protect\fbox{2}] Next, we release our requirement of a "true" labelling function $f$. We do this by letting $\mathcal{D}$ be a distribution over $X x Y = Z$. We need to adjust our definitions of empirical error and generalization error:
+	\item[\protect\fbox{2}] Next, we release our requirement of a "true" labelling function $f$. We do this by letting $\mathcal{D}$ be a distribution over $\mathcal{X} \times \mathcal{Y} = \mathcal{Z}$. We need to adjust our definitions of empirical error and generalization error:
 	\begin{eqnarray}
 		L_{\mathcal{D}}(h) = \mathbb{P}_{(x, y) \sim \mathcal{D}}
 	\end{eqnarray}
@@ -205,10 +205,116 @@ Both \protect\fbox{1} and \protect\fbox{2} lead to:
 		\item every distribution $\mathcal{D}$ over domain $\mathcal{X} \times \mathcal{Y}$
 	\end{enumerate}
 	running $\mathcal{A}$ on $m \geq m_H(\varepsilon, \delta)$ \textit{iid.} instances drawn from $\mathcal{D}$, returns a hypothesis $h$ such that with probability of at least $1-\delta$ (over choice of S) 
-	$$ L_{\mathcal{D}}(h) \leq \min_{h' \in H} L_{\mathcal{D}}(h') + \varepsilon$$
+	\textcolor{red}{$$ 
+		L_{\mathcal{D}}(h) \leq \min_{h' \in H} L_{\mathcal{D}}(h') + \varepsilon
+		$$}
 \end{boxeddef}
+Implicit assumption: the best possible thing from the hypothesis class is at least okay. If it is large, then the min is large, and consequently the threshold is bad!\\
+To show that \textit{finite classes are agnostic PAC learnable}, we will use the Höffding inequality.
 
+\paragraph{General loss functions}
+	$$ l: H \times (X \times Y) \rightarrow \mathbb{R}_+ $$
+Example: \textcolor{red}{0-1 loss}\\
+$$ l^{0-1}\left( h, \left(x,y\right) \right) = \begin{cases}
+	1, &  \text{if } h(x) \neq y  \\
+	0, &  \text{else} 
+\end{cases}$$
 
+\textcolor{red}{square loss:}
+\begin{align*}
+l^{sq}(h, \underbrace{\left(x,y\right)}_{\text{e.g.} \in \mathbb{R}}) =  \left(y-h(x)\right)^2 & \hspace{3cm} \text{\textit{e.g. in regression problems}}
+\end{align*}
+In case of general loss functions, we adjust our definitions of $L_\mathcal{D}$ and $L_\mathcal{S}$ as follows:
+$$ 
+L_\mathcal{D}(h) =  \mathbb{E}_z[l(h, z)], \ \  L_\mathcal{S}(h) = \frac{1}{m} \cdot \sum_{i = 1}^{m} l(h, z_i)
+$$
 
+\paragraph{Remark:}
+$$
+\mathbb{E}_z\left[l^{0-1}(h,z)\right] = 0 \cdot \mathbb{P}_z[h(x) = y] + 1 \cdot \mathbb{P}_z[h(x) \neq y] = \mathbb{P}_z[h(x) \neq y]
+$$
+
+\section*{Uniform convergence}
+\begin{boxeddef}[$\varepsilon$-representative sample]
+	A sample S is called \textcolor{red}{$\varepsilon$-representative sample} wrt. $\mathcal{Z} (= \mathcal{X}\times\mathcal{Y})$, loss function $l$ and distribution $\mathcal{D}$, if
+	$$
+	\forall h \in H: \left|L_S(h) - L_\mathcal{D}(h)\right| \leq \varepsilon
+	$$
+\end{boxeddef}
+\paragraph{Lemma:} Assume that S is $\frac{\varepsilon}{2}$-representative wrt. $\mathcal{Z}, H, l$ and $\mathcal{D}$. Then, any hypothesis \textcolor{red}{$h_S$} returned by $ERM_H(S) \in argmin_{h' \in H}(L_\mathcal{S}(h'))$ satisfies
+$$
+	L_D(\text{\textcolor{red}{$h_S$}}) \leq \min_{h \in H} L_D(h) + \varepsilon
+$$
+
+\begin{proof}
+for \colorbox{Apricot}{any} $h \in H$:
+\begin{align*}
+	L_\mathcal{D}(h_s) &\leq L_S(h_S) + \frac{\varepsilon}{2}  \tag{by def. $\varepsilon$-representativeness}\\
+	&\leq L_S(h) + \frac{\varepsilon}{2} \tag{as $h_S$ is ERM-hyp.}\\
+	&\leq L_\mathcal{D}(h) + \frac{\varepsilon}{2} + \frac{\varepsilon}{2} \tag{by def. $\varepsilon$-representativeness}\\
+	&\leq  L_\mathcal{D}(h) + \varepsilon
+\end{align*}
+As this inequality chain holds for any $h \in H$, we conclude that $$L_\mathcal{D}(h_S) \leq \min_{h \in H} L_\mathcal{D}(h) + \varepsilon$$
+\end{proof}
+This leads us to the definition of uniform convergence:
+\begin{boxeddef}[Uniform convergence]
+	A hypothesis class $H$ has the \textcolor{red}{uniform convergence (UC)} property (wrt. $\mathcal{Z}$ and loss function $l$) if there exists\\
+	 $m_H^{UC}: (0,1)^2 \rightarrow \mathbb{N}$ such that for every $\varepsilon, \delta \in (0,1)$ and every distribution $\mathcal{D}$ over $\mathcal{Z}$, if $\mathcal{S}$ is an iid sample of size $m > m_H^{UC}(\varepsilon, \delta)$ from $\mathcal{D}$, then with probability of at least $1-\delta$ (over the choice of $\mathcal{S}$), $\mathcal{S}$ is $\varepsilon$-representative
+\end{boxeddef}
+\paragraph{Corollary:} if $H$ has the UC property with $m_H^{UC}$, then $H$ is agnostic PAC learnable with 
+$$
+	m_H(\varepsilon, \delta) \leq m_H^{UC}(\frac{\varepsilon}{2}, \delta)
+$$
+\colorbox{Apricot}{LETZTE ZEILE FEHLT}
+
+\paragraph{Claim:} Finite $H$ ($|H|< \infty$) are agnostic PAC learnable.\\
+Given fixed $\varepsilon, \delta \in (0,1)$, we want to show that
+$$
+	D^{m}\Big(\big\{\mathcal{S}: \forall h \in H: \left|L_S(h) - L_D(h) \right| \leq \varepsilon\big\}\Big) \geq 1-\delta
+$$
+Equivalently, 
+$$
+	D^{m}\Big(\big\{S: \exists h\in H: \big|L_S(h)-L_D(h)\big|\textcolor{red}{>}\ \varepsilon \big\}\Big) < \delta
+$$
+KOMMENTAR ZUR UNION EINFÜGEN
+We bound
+$$
+	D^{m} (UNION) \leq \sum_{h \in H} 
+$$
+HIER BEARBEITEN\\
+
+\begin{proof}
+	Lets fix $ l = l^{0-1}$. As we know that 
+$$
+	L_D(h) = \mathbb{E}(l(H, z))
+$$ and 
+$$
+	L_s(h) = \frac{1}{m} \sum_{i = 1}^{m} l(h, z_i),
+$$
+we can use Höffding's inequality (with $b = 1, a=0$):
+
+$$
+	D^{m}(\{ S: \exists h \in H: |L_S(h) - L_D(h)| > \varepsilon\}) \leq \sum_{h \in H} 2 \cdot e^{-2 \varepsilon^2 m} = 2 \cdot |H| \cdot  e^{-2 \varepsilon^2 m}
+$$
+Let $e^{-2 \varepsilon^2 m}$ be smaller than $\delta$, i.e.,
+$$
+	2 \cdot |H| \cdot  e^{-2 \varepsilon^2 m} < \delta \leftrightarrow m > \log\left( \frac{2 \cdot |H|}{\delta}\right)\cdot \frac{1}{2 \varepsilon^2}
+$$
+This gives us the \underline{sample complexity function} $m_{H}^{UC}$ for uniform convergence. In other words, for l: $H \times Z \rightarrow [0,1]$, we have 
+EINFÜGEN\\
+
+and by our earlier corollary we get for the sample complexity function $m_H$ for \underline{agnostic PAC learnability} 
+$$
+	m_H(\varepsilon, \delta) \leq m_H^{UC}\left(\frac{\varepsilon}{2}, \delta\right) \leq \left\lceil \frac{2 \cdot \log\left(\frac{2\cdot |H|}{\delta}\right)}{\varepsilon^2} \right\rceil
+$$
+This establishes the claim.
+\end{proof}
+The first case that causes problems with this definition:
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{sketch_2}
+	\caption{Problematic Case 2}
+	\label{fig:sketch2}
+\end{figure}
 
 \end{document}
