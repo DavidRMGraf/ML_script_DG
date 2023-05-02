@@ -1,14 +1,23 @@
 \documentclass[10pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+
+% graphics and color housekeeping
 \usepackage{graphicx}
 \usepackage[usenames, dvipsnames]{xcolor}
 \usepackage{float}
+
+% nicer math
 \usepackage{mathtools}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amsthm}
 \usepackage{thmtools}
+
+% nice indicator function
+%% https://tex.stackexchange.com/questions/26637/how-do-you-get-mathbb1-to-work-characteristic-function-of-a-set
+\usepackage{bbm}
+
 \usepackage{enumitem}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[part]
@@ -167,14 +176,15 @@ We will now move to a more general setting.
 	\begin{boxeddef}[Höffding inequality]
 	Let $X_1, ..., X_m$ be \textit{iid} random variables taking values in $[a_i, b_i]$ for $i \in [m]$. Then, it holds that
 	 \begin{align*}
-	 	\mathbb{P}\left[S_m - \mathbb{E}[S_m] > \varepsilon\right] &\leq e^{\left(\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}\right)} && ; S_m = \sum_{i = 1}^{m} X_i, \text{ and}\\
-	 	\mathbb{P}\left[S_m - \mathbb{E}[S_m] < -\varepsilon\right] &\leq e^{\left(\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}\right)} 
-	\end{align*}
-	Also:
-	\begin{align*}
-	 	\mathbb{P}\bigg[\big|S_m - \mathbb{E}[S_m]\big| > \varepsilon\bigg] &\leq 2 \cdot e^{\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}}\\
-	 	HIER NOTIZ EINFÜGEN
+	 	&\mathbb{P}\left[S_m - \mathbb{E}[S_m] > \varepsilon\right] &\leq e^{\left(\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}\right)} && ; S_m = \sum_{i = 1}^{m} X_i, \text{ and}\\
+	 	&\mathbb{P}\left[S_m - \mathbb{E}[S_m] < -\varepsilon\right] &\leq e^{\left(\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}\right)}\\
+	 	\text{\underline{Also:}}
 	 \end{align*}
+	 \begin{center}
+	 	\colorbox{Apricot}{$\mathbb{P}\bigg[\big|S_m - \mathbb{E}[S_m]\big| > \varepsilon\bigg] \leq 2 \cdot e^{\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}}$}\\
+ 		 As we have $|a| \geq b \Leftrightarrow a \leq -b \text{ \underline{OR} } a \geq b$
+	 \end{center}
+
 
 \end{boxeddef}
 Another useful form of this inequality is:
@@ -317,4 +327,107 @@ The first case that causes problems with this definition:
 	\label{fig:sketch2}
 \end{figure}
 
+\paragraph{Question:} Is there a "universal" learner?, i.e. a learner \textit{without any prior knowledge} (w.r.t. $H, \mathcal{D, ...}$) of a task (\textcolor{red}{specified by $\mathcal{D}$}), but can be challenged by any task (and achieves low $L_\mathcal{D}\left(A\left(s\right)\right)$). 
+
+\paragraph{Theorem (No Free Lunch)}:
+Let A be a learning algorithm for the task of binary classification with respect to O-1 loss over a domain $\mathcal{X}$. Also, let $m$ be any number smaller than ${\frac{|\mathcal{X}|}{2}}$, representing the training set size. Then, there exists a distribution $\mathcal{D}$ over $\mathcal{X} \times \left\{0, 1\right\}$ such that
+\begin{enumerate}
+	\item $\exists f: \mathcal{X} \to \left\{0,1\right\} with L_D(f) = 0$
+	 \item with probability of at least $\frac{1}{7}$ over the choice of $S \sim \mathcal{D}^m$, we have\\
+	 $$ L_\mathcal{D}\left(A(s)\right) \geq \frac{1}{8}.$$
+\end{enumerate}
+2. means that the learner fails on that task; 1. means that the task can be successfully learned by another learner (e.g. ERM$_{\mathcal{H}}$ for $\mathcal{H} = \left\{f\right\}$).
+
+\begin{proof}
+	Let $C \subset \mathcal{X}$ be of size \textcolor{red}{$2m$}, $|C| = 2m$. The number of possible labellings of C is  $T = 2^{2m}$ (as we have 2m labels with 2 possibilities each). Lets denote the functions which realize these T labellings as 
+	$$ f_1 , ..., f_T $$
+	For \underline{each $f_i$}, we define the following:
+	\begin{align*}
+		\underbrace{\mathcal{D}_{\textcolor{red}{i}}\big(\left\{(x,y)\right\}\big)}_{\text{defines a task}} = \begin{cases}
+				\frac{1}{|C|} , &  \text{if $y = f_{\textcolor{red}{i}}(x)$}\\
+				0 , &   \text{else} 
+		\end{cases}
+	\end{align*}
+	Hence, by construction 
+	$$
+		L_{\mathcal{D}_{\textcolor{red}{i}}}(f_{\textcolor{red}{i}}) = 0
+	$$
+	With that in mind, we will show that for every learning algorithm A that receives m samples from $\mathcal{X} \times \left\{0,1\right\}$ , there exists a function $f: \mathcal{X} \to \left\{0,1\right\}$ and a distribution $\mathcal{D}$ over $\mathcal{X} \times \left\{0,1\right\}$ such that
+
+		\begin{enumerate}
+
+			\item $L_\mathcal{D}(f) = 0$, and
+			\item $\mathbb{E}_{S \sim \mathcal{D}^m}\big[L_\mathcal{D}(A(s))\big] \geq \frac{1}{4}$ \hspace{1cm} \textbf{(*)}
+		\end{enumerate}	
+	In particular, we show that for every learning algorithm A receiving m samples from $C \times \left\{0,1\right\}$ and returning a function $A(S): X \to \left\{0,1\right\}$, we have
+	
+	$$
+		\max_{i \in [T]} \mathbb{E}_{S \sim D^{m}_{\textcolor{red}{i}}}\bigg[L_{\mathcal{D}_{\textcolor{red}{i}}}\big(A(s)\big)\bigg] \geq \frac{1}{4} \hspace{1cm} \text{\textbf{(**)}}
+	$$
+	\paragraph{Remark (*):} suffices for $L_D(A(s)) \geq \frac{1}{8}$ with probability of at least $\frac{1}{7}$ over the choice of $S \sim D^m$ (see PS exercise!)\\
+	
+	\paragraph{Lets show that (**) holds:} We know that there are \textcolor{red}{$(2m)^m = k$} possible training sequences of size m (remember $|C| = 2m$) from $C$. Lets call them
+	$$ S_1, ..., S_k $$
+	Also, lets call $S_{\textcolor{orange}{j}}^{\textcolor{red}{i}}$ the sequence $S_{\textcolor{orange}{j}}$ labelled by $f_{\textcolor{red}{i}}$, i.e.,
+	$$
+		S_j^i = \left((x_1, f_i(x_i), ..., (x_m, f_i(x_m))\right)
+	$$ 
+	$$
+		\text{with } S_j = (x_1, ..., x_m)
+	$$
+	Now, in case the distribution is $\mathcal{D}_i$, then $S_1^i, ..., S_k^i$ are the possible training sequences that A can receive. Note that, by construction of the $\mathcal{D}_i$, \underline{all} these training sequences have equal probability of being drawn/sampled.
+	$$
+		\Rightarrow\mathbb{E}_{S \sim D^{m}_{\textcolor{red}{i}}}\bigg[L_{\mathcal{D}_{\textcolor{red}{i}}}\big(A(s)\big)\bigg] = \underbrace{\frac{1}{k}}_{\text{no. of possible training sequences of size m}} \cdot \sum_{j = i}^{k} L_{\mathcal{D}_i}(A(S_{j}^{i})) \hspace{1cm} \text{\textbf{(***)}}
+	$$ 
+	$\Big($Lets remember that we want to show
+	$
+		\max_{i \in [T]} \mathbb{E}_{S \sim D^{m}_{\textcolor{red}{i}}}\bigg[L_{\mathcal{D}_{\textcolor{red}{i}}}\big(A(s)\big)\bigg] \geq \frac{1}{4}
+	$ $\Big)$
+	\begin{align*}
+		\max_{i \in [T]} \mathbb{E}_{S \sim D^{m}_{\textcolor{red}{i}}}\bigg[L_{\mathcal{D}_{\textcolor{red}{i}}}\big(A(s)\big)\bigg] &= \max_{i \in [T]} \frac{1}{k} \cdot \sum_{j = i}^{k} L_{\mathcal{D}_i}(A(S_{j}^{i}))  \\
+		&\geq \frac{1}{T} \cdot \sum_{i=1}^{T} \frac{1}{k} \sum_{j = i}^{k} L_{\mathcal{D}_i}(A(S_j^i)) \\
+		&= \frac{1}{k} \cdot \sum_{j=1}^{k} \frac{1}{T} \sum_{i = 1}^{T} L_{\mathcal{D}_i}(A(S_j^i))\\
+		&\leq \min_{j \in [k]} \frac{1}{T} \cdot \sum_{i = 1}^{T} L_{\mathcal{D}_i}(A(S_j^i))
+	\end{align*}
+	\paragraph{Lets fix some $j \in [k]$:}
+	$$(S_j = (x_1, ..., x_m))$$
+	As $S_j$ is of size m, but C is of size $2m$, there are instances from C which we have not seen. Lets call them 
+	$$ V_1, ..., V_p$$
+	We also know that \textcolor{red}{$p \geq m$}.\\
+	
+	For every $h: C \to \left\{0,1\right\}$ and every \colorbox{orange}{i}, it holds that 
+	\begin{align*}
+		L_{\mathcal{D}_i} &= \frac{1}{2m} \cdot \sum_{x \in C} hier ergänzen\\
+		&\geq \frac{1}{2m} \cdot \sum_{r = 1}^{p} 1 h(V_r) \neq f_i(v_r)\\
+		&\geq \frac{1}{2p} \sum_{r = 1}^{p} 1 h(V_r) \neq f_i(v_r) && \text{\textbf{(****)}}
+	\end{align*}
+	
+	Combining results gives 
+	$$
+		\frac{1}{T} \cdot \sum_{i = 1}^{T} L_{\mathcal{D}_i}(A(S_j^i)) \geq \frac{1}{T} \cdot \sum_{i = 1}^{T} \frac{1}{2p} \sum_{r = 1}^{p} 1 A(S_j^i)(V_r)
+	$$
+	A run on $S_j^i$ gives some $h: C \to \left\{0,1\right\}$ and we know that (****) holds for every $h: C \to \{ 0,1 \}$
+\begin{align*}
+		= \frac{1}{2p}\sum_{r = 1}^{p}\frac{1}{T} \sum_{i = 1}^{T} \mathbbm{1}	\\
+		hierergänzen
+\end{align*}
+\paragraph{Lets fix some $r \in [p]$:} Remember that we have $f_1, ..., f_T$ (for $T = 2^{2m}$ labelings).\\
+\underline{Example:} say $m = 1, |C| = 2$
+\begin{table}[H]
+	\begin{tabular}{lll|l}
+		&  & $c_1$ & $v_1$ \\ \cline{3-4} 
+		\textcolor{purple}{$f_1$} &  & 0     & 0     \\
+		\textcolor{purple}{$f_2$} &  & 0     & 1     \\
+		\textcolor{purple}{$f_3$} &  & 1     & 0     \\
+		\textcolor{purple}{$f_4$} &  & 1     & 1    
+	\end{tabular}
+\end{table}
+
+Partition into 2 pairs (\textcolor{purple}{$f_1, f_2$}) and (\textcolor{purple}{$f_3, f_4$}), where (\textcolor{purple}{$f_1, f_2$}) only differ by $v_1$ \underline{and} (\textcolor{purple}{$f_3, f_4$}) only differ by $v_1$\\
+In general, we can partition into \textcolor{red}{$\frac{T}{2}$} disjoint pairs of functions ($f_i$'s). For every pair $(f_i, f_i')$ we have that for every $c \in C$
+$$
+	f_i(C) \neq f_i'(C) \text{\textbf{ if and only if }} c = v_r
+$$
+For such a pair, we have $S_j^{i} = S_{j}^{i'}$
+\end{proof}
 \end{document}
