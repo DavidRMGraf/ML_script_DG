@@ -13,6 +13,8 @@
 \usepackage{amsfonts}
 \usepackage{amsthm}
 \usepackage{thmtools}
+\usepackage{cancel}
+
 
 % nice indicator function
 %% https://tex.stackexchange.com/questions/26637/how-do-you-get-mathbb1-to-work-characteristic-function-of-a-set
@@ -32,13 +34,13 @@
 \newtheorem{example}{Example}[definition]
 
 
-\title{Machine Learning 2023}
-\author{David Graf}
-\date{\today}
+\title{Machine Learning Lecture}
+\author{Prof. Roland Kwitt \thanks{Lecture \& Content} \and David R. M. Graf \thanks{Script}}
+\date{summer term 2023}
 \begin{document}
 	\maketitle
 \part{Actual ML lecture content}
-Recap of our setup:
+\section*{Recap of our setup}
 \begin{enumerate}
 	\item DOMAIN set X; we call $x\in X$ an instance
 	\item LABEL set Y; e.g. $Y = \{0, 1\}$ (for a binary problem)
@@ -47,7 +49,7 @@ Recap of our setup:
 	$$ h: X \to Y$$
 	which we call a hypothesis
 \end{enumerate}
-Assumption: for now, we assume $x_i$'s are drawn iid from some probability measure $\mathcal{D}$ over the domain and labelled by some function (the labelling function) $f: X \to Y$:
+\paragraph{Assumption:} for now, we assume $x_i$'s are drawn iid from some probability measure $\mathcal{D}$ over the domain and labelled by some function (the labelling function) $f: X \to Y$:
 $$ x_i \underbrace{ \sim }_{\text{\scriptsize"drawn from"}} \mathcal{D},\ y_i = f(x_i)$$
 
 We are "interested" in 
@@ -55,27 +57,26 @@ $$\mathcal{D}(\{x \in X: h(x) \neq f(x) \}) = \mathbb{P}_{X \sim \mathcal{D}}[h(
 $L_{\mathcal{D}, f}(h)$ is called the "Generalization Error" or "Risk".\\
 \newline
 The \underline{empirical version} of this is 
-\begin{equation}
-	\tag{[m] = \{1, ..., m\}}
-	\frac{1}{m}\cdot\big|\big\{ i \in [m]: h(x_i) \neq f(x_i) \big\}\big| = L_\mathcal{S}(h)
-\end{equation}
+\begin{align*}
+	 \frac{1}{m}\cdot\bigg|\big\{ i \in [m]: h(x_i) \neq f(x_i) \big\}\bigg| = L_\mathcal{S}(h) & \hspace{2cm} [m] = \{1, ..., m\}
+\end{align*}
 the empirical error or empirical risk $L_\mathcal{S}(h)$.
 \paragraph{Convention:}
 $\mathcal{S}|_x = (x_1,..., x_m)$
 
 \paragraph{Claim:}
-ADD COMMENTS ON THE SIDE HERE, SLIDE 27
 \begin{align*}
- \mathbb{E}_{\mathcal{S}|_x \sim \mathcal{D}^m}[L_\mathcal{S}(H)] &= \mathbb{E}_{\mathcal{S}|_x}\bigg[\frac{1}{m} \cdot \sum_{i=1}^{m} 1_{h(x_i) \neq f(x_i)}\bigg]\\
- &= \frac{1}{m} \cdot \sum_{i=1}^{m} \mathbb{E}_{x_i \sim \mathcal{D}}[1_{h(x_i) \neq f(x_i)}] && \text{(by linearity of $\mathbb{E}$)}\\
- &= \frac{1}{m} \cdot \sum_{i=1}^{m} \mathbb{E}_{X \sim \mathcal{D}}[1_{h(x) \neq f(x)}]\\
- &= \frac{1}{m} \cdot \sum_{i=1}^{m} \mathbb{P}_{X\sim \mathcal{D}}[1_{h(x) \neq f(x)}]\\
- &=  \frac{1}{m} \cdot m \cdot \mathbb{P}_{X\sim \mathcal{D}}[1_{h(x) \neq f(x)}]\\
- &= L_{\mathcal{D},f}(h)
+ \mathbb{E}_{\mathcal{S}|_x \sim \mathcal{D}^m}\big[L_\mathcal{S}(H)\big] &= \mathbb{E}_{\mathcal{S}|_x}\bigg[\frac{1}{m} \cdot \sum_{i=1}^{m} \mathbbm{1}_{h(x_i) \neq f(x_i)}\bigg]  &&  \text{by Def.}\\
+ & \hspace{-1cm}\scriptsize{\text{where } \mathbbm{1}_{h(x_i) \neq f(x_i)} = \begin{cases} 1 , &  \text{if $h(x_i) \neq f(x_i)$} \\ 0 , & \text{else} \end{cases}}\\
+ &= \frac{1}{m} \cdot \sum_{i=1}^{m} \mathbb{E}_{x_i \sim \mathcal{D}}[\mathbbm{1}_{h(x_i) \neq f(x_i)}] && \text{(by linearity of $\mathbb{E}$)}\\
+ &= \frac{1}{m} \cdot \sum_{i=1}^{m} \mathbb{E}_{X \sim \mathcal{D}}[\mathbbm{1}_{h(x) \neq f(x)}] && \text{(as the $x_i$ are \textit{iid})}\\
+ &= \frac{1}{m} \cdot \sum_{i=1}^{m} \mathbb{P}_{X\sim \mathcal{D}}[\mathbbm{1}_{h(x) \neq f(x)}] && \text{(as $\mathbbm{1}_{...}$ only takes values 0, 1)}\\
+ &=  \cancel{\frac{1}{m} \cdot m} \cdot \mathbb{P}_{X\sim \mathcal{D}}[\mathbbm{1}_{h(x) \neq f(x)}]\\
+ &= L_{\mathcal{D},f}(h) && \text{(this establishes the claim)}
 \end{align*}
 
-\paragraph{Our first learning paradigm} \underline{Empirical risk minimization (ERM)}:\\
-As we only have access to the training data (S), it's natural to try to select \underline{h} such that the empirical risk is minimized. We call such an h an \underline{empirical risk minimizer} $(h_S)$.\\
+\section*{Our first learning paradigm} 
+\paragraph{\textcolor{red}{Empirical risk minimization (ERM):}} As we only have access to the training data (S), it's natural to try to select \underline{h} such that the empirical risk is minimized. We call such an h an \underline{empirical risk minimizer} $(h_S)$.\\
 
 \underline{A problematic case:}
 \begin{figure}[H]
@@ -94,10 +95,10 @@ As we only have access to the training data (S), it's natural to try to select \
 			0 , &  \text{else} 
 		\end{cases} && \text{(a lookup table)} 
 	\end{align*}
-	Obviously $h_S$ is correct on our training set $$\implies L_S(h_S) = 0\text{ !}$$
-	But on unseen instances from $D (X \sim D)$, $h_S$ is only correct 50\% of the time (due to the ratio of the areas of the black and red squares in the sketch): $$\implies L_{D,f}(h_S) = \frac{1}{2} \text{ !}$$
-	This is called overfitting.
 \end{itemize}
+Obviously $h_S$ is correct on our training set $\implies$ \colorbox{Apricot}{$L_S(h_S) = 0 \text{ !}$}
+But on unseen instances from $\mathcal{D} (X \sim \mathcal{D})$, $h_S$ is only correct 50\% of the time (due to the ratio of the areas of the black and red squares in the sketch): $\implies $ \colorbox{Apricot}{$L_{\mathcal{D},f}(h_S) = \frac{1}{2} \text{ !}$}
+This is called \textbf{overfitting}.
 
 \paragraph{Hypothesis class (H):} We restrict searching for h to H, i.e., a class of functions from X to Y, and write:
 $$
@@ -105,24 +106,26 @@ $$
 $$
 \underline{Remark:} In our previous example, we did not do this and allowed to memorize the training data!
 
-\paragraph{ERM over finite hypothesis classes $(\big|H\big| < \infty)$:} 
-$$\text{\underline{Assumption (realizability):} } \exists \ h^*\in H \text{ with } L_{\mathcal{D},f}(h^*) = 0$$
+\section*{ERM over finite hypothesis classes $(\big|H\big| < \infty)$}
+\underline{Assumption (realizability):} $ \exists \ h^*\in H \text{ with } L_{\mathcal{D},f}(h^*) = 0$\\
 Now, any ERM hypothesis $h_\mathcal{S}$ will attain 0 empirical error ($L_\mathcal{S}(h_\mathcal{S}) = 0$), as it computes with $h^*$ (which obviously has 0 empirical error).\\
 \newline
 Hence, $L_{\mathcal{D},f}(h_\mathcal{S}) > \varepsilon$ can only happen if we select a hypothesis with $L_\mathcal{S}(h_\mathcal{S}) = 0$ but $L_{\mathcal{D},f}(h_\mathcal{S}) > \varepsilon$ (trivially). We can write
 \begin{align*}
-	H_\text{\textbf{bad}} = \{h \in H: L_{D,f}(h)>\varepsilon\} && \text{ set of \textbf{bad} hypotheses}
+	H_\text{\textbf{bad}} &= \{h \in H: L_{D,f}(h)>\varepsilon\} && \text{ set of \textbf{bad} hypotheses}\\
 \end{align*}
 Also, we define
-$$
-	M = \{\mathcal{S}|_x : \exists h \in \underbrace{H_{\mathrm{\textbf{bad}}}}_{\mathclap{\text{those are the ones with generalization error $> \varepsilon$}}}, L_\mathcal{S}(h) = 0  \}
-$$
+\begin{align*}
+	M &= \{\mathcal{S}|_x : \exists h \in \underbrace{H_{\mathrm{\textbf{bad}}}}_{
+		\mathclap{  \text{ those are the ones with generalization error $> \varepsilon$ } }
+		}, L_\mathcal{S}(h) = 0  \}\\
+\end{align*}
 
-We observe
-$$
-\big\{\mathcal{S}|_x : L_{\mathcal{D},f}(\underbrace{h_\mathcal{S}}_{\mathclap{\text{ERM}}}) \geq \varepsilon\big\} \subseteq  \underbrace{\big\{\mathcal{S}|_x : \exists \ h \in H_{\mathrm{\textbf{bad}}}, L_\mathcal{S}(h) = 0 \big\}}_{\mathclap{M = \cup_{h \in H_{\mathrm{\textbf{bad}}}}\{\mathcal{S}|_x: L_{\mathcal{S}}(h) = 0\} }} = M
-$$
-
+We observe:
+\begin{align*}
+	\big\{\mathcal{S}|_x : L_{\mathcal{D},f}(\underbrace{h_\mathcal{S}}_{\mathclap{\text{ERM}}}) \geq \varepsilon\big\} &\subseteq \big\{\mathcal{S}|_x : \exists \ h \in H_{\mathrm{\textbf{bad}}}, L_\mathcal{S}(h) = 0 \big\}= M\\
+	 \implies M &= \bigcup_{h \in H_{\mathrm{\textbf{bad}}}}\{\mathcal{S}|_x: L_{\mathcal{S}}(h) = 0\}
+\end{align*}
 We get (upon measuring with $\mathcal{D}$):
 \begin{align*}
 \mathcal{D}^m \big( \{\mathcal{S}|_x : L_{\mathcal{D},f}(h_\mathcal{S}) \geq \varepsilon\}\big) &\leq \mathcal{D}^m\big( \cup_{h \in H_{\mathrm{\textbf{bad}}}}\{\mathcal{S}|_x : L_{\mathcal{S}}(h) = 0\} \big)\\
@@ -145,13 +148,14 @@ So, to conclude:
 \end{align*}
 This is a probabilistic guarantee that tells us how the generalization error scales with the sample size. If we increase m, ew can make $\varepsilon$ arbitrarily small. 
 If we let $ |H| \cdot e^{-\varepsilon m} <\delta \in (0,1)$ and solve for $m$, we get 
-$$ m>\frac{1}{\underbrace{\colorbox{orange}{$\varepsilon$}}_{error}} \cdot \log \Big(\frac{|H|}{\underbrace{\colorbox{orange}{$\delta$}}_{confidence}}\Big)$$
+$$ m>\frac{1}{\underbrace{\colorbox{Apricot}{$\varepsilon$}}_{error}} \cdot \log \Big(\frac{|H|}{\underbrace{\colorbox{Apricot}{$\delta$}}_{confidence}}\Big)$$
 \paragraph{Corollary:} Let $|H| < \infty$ and $\varepsilon, \delta \in (0,1)$. Let $m$ be an integer (the sample size) such that $\color{red} m>\frac{1}{\varepsilon} \cdot log \big(\frac{|H|}{\delta}\big)$. Then, for each labeling function $f: X \to Y$ and any distribution $\mathcal{D}$ over domain $X$ (for which realizability holds), we have that with probability of at least $1-f$ over the choice of $S|_x$ (of size m) it holds that every ERM hypothesis $h_s$ satisfies the following:
 $$ L_{\mathcal{D},f} \leq \varepsilon $$
 
 \textcolor{red}{\paragraph{Interpretation:} For sufficiently large $m, ERM_H$ returns $h_S$ (i.e., a hypothesis) that is \textbf{P}ROBABLY \textbf{A}PPROXIMATELY \textbf{C}ORRECT (PAC).}\\
 \newline
 This leads to:
+\section*{PAC learnability}
 \begin{boxeddef}[PAC learnability]
 	A hypothesis class $H$ is \textcolor{red}{PAC learnable}, if there exists a function $m_H: (0,1)^2 \to \mathbb{N}$ and a learning algorithm $\mathcal{A}$ with the following properties:
 	\begin{enumerate}
@@ -176,7 +180,7 @@ We will now move to a more general setting.
 	\begin{boxeddef}[Höffding inequality]
 	Let $X_1, ..., X_m$ be \textit{iid} random variables taking values in $[a_i, b_i]$ for $i \in [m]$. Then, it holds that
 	 \begin{align*}
-	 	&\mathbb{P}\left[S_m - \mathbb{E}[S_m] > \varepsilon\right] &\leq e^{\left(\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}\right)} && ; S_m = \sum_{i = 1}^{m} X_i, \text{ and}\\
+	 	&\mathbb{P}\left[S_m - \mathbb{E}[S_m] > \varepsilon\right] &\leq e^{\left(\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}\right)} && \hspace{0.4cm} S_m = \sum_{i = 1}^{m} X_i, \text{ and}\\
 	 	&\mathbb{P}\left[S_m - \mathbb{E}[S_m] < -\varepsilon\right] &\leq e^{\left(\frac{-2 \varepsilon^2}{\sum_{i} (b_i - a_i)^2}\right)}\\
 	 	\text{\underline{Also:}}
 	 \end{align*}
@@ -188,9 +192,10 @@ We will now move to a more general setting.
 
 \end{boxeddef}
 Another useful form of this inequality is:
-$$ \mathbb{P} \left[\left| \frac{1}{m} \cdot \sum_{i = 1}^{m} X_i - \mu \right| \geq \varepsilon\right] \leq 2 \cdot e^{\frac{-2 \varepsilon^2 m}{b-a}} $$
+$$ \mathbb{P} \bigg[\left| \frac{1}{m} \cdot \sum_{i = 1}^{m} X_i - \mu \right| \geq \varepsilon\bigg] \leq 2 \cdot e^{\frac{-2 \varepsilon^2 m}{b-a}} $$
 with $\mu = \mathbb{E}[X_i]$ and $\mathbb{P}[a \leq X_i \leq b] = 1$ for all $i \in [m]$. As a consequence, we can say the following: fix $\varepsilon>0$; then for any \colorbox{Apricot}{\underline{single} $h: X \to Y$}, we have 
 $$ \mathbb{P}_{S|_x \sim \mathcal{D}^m}\left[\left|L_{s}(h) - L_{\mathcal{D}, f}\right| > \varepsilon\right] \leq 2 e^{-2\varepsilon^2 m} \hspace{1cm} (a = 0, b = 1)$$
+
 If we would set $\delta = 2^{-2 \varepsilon^2 m}$, and solve for $\varepsilon$, we would get
 \begin{align*}
 \varepsilon &= \sqrt{\frac{log\big(\frac{2}{\delta}\big)}{2m}}\\
@@ -208,6 +213,7 @@ We will see that we did need realizability for that!
 	\end{eqnarray}
 \end{enumerate}
 Both \protect\fbox{1} and \protect\fbox{2} lead to:
+\section*{Agnostic PAC learnability}
 \begin{boxeddef}[Agnostic PAC learnability]
 	A hypothesis class $H$ is \textcolor{red}{agnostic PAC learnable}, if there exists a function $m_H: (0,1)^2 \to \mathbb{N}$ and a learning algorithm $\mathcal{A}$ with the following properties:
 	\begin{enumerate}
