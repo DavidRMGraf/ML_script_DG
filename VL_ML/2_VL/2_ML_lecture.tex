@@ -335,7 +335,7 @@ The first case that causes problems with this definition:
 
 \paragraph{Question:} Is there a "universal" learner?, i.e. a learner \textit{without any prior knowledge} (w.r.t. $H, \mathcal{D, ...}$) of a task (\textcolor{red}{specified by $\mathcal{D}$}), but can be challenged by any task (and achieves low $L_\mathcal{D}\left(A\left(s\right)\right)$). 
 
-\paragraph{Theorem (No Free Lunch)}:
+\section{No-Free-Lunch Theorem}
 Let A be a learning algorithm for the task of binary classification with respect to O-1 loss over a domain $\mathcal{X}$. Also, let $m$ be any number smaller than ${\frac{|\mathcal{X}|}{2}}$, representing the training set size. Then, there exists a distribution $\mathcal{D}$ over $\mathcal{X} \times \left\{0, 1\right\}$ such that
 \begin{enumerate}
 	\item $\exists f: \mathcal{X} \to \left\{0,1\right\} with L_D(f) = 0$
@@ -383,7 +383,7 @@ Let A be a learning algorithm for the task of binary classification with respect
 	$$
 	Now, in case the distribution is $\mathcal{D}_i$, then $S_1^i, ..., S_k^i$ are the possible training sequences that A can receive. Note that, by construction of the $\mathcal{D}_i$, \underline{all} these training sequences have equal probability of being drawn/sampled.
 	$$
-		\Rightarrow\mathbb{E}_{S \sim D^{m}_{\textcolor{red}{i}}}\bigg[L_{\mathcal{D}_{\textcolor{red}{i}}}\big(A(s)\big)\bigg] = \underbrace{\frac{1}{k}}_{\text{no. of possible training sequences of size m}} \cdot \sum_{j = i}^{k} L_{\mathcal{D}_i}(A(S_{j}^{i})) \hspace{1cm} \text{\textbf{(***)}}
+		\Rightarrow\mathbb{E}_{S \sim D^{m}_{\textcolor{red}{i}}}\bigg[L_{\mathcal{D}_{\textcolor{red}{i}}}\big(A(s)\big)\bigg] = \underbrace{\frac{1}{k}}_{\mathclap{  \text{no. of possible training sequences of size m}}} \cdot \sum_{j = i}^{k} L_{\mathcal{D}_i}(A(S_{j}^{i})) \hspace{1cm} \text{\textbf{(***)}}
 	$$ 
 	$\Big($Lets remember that we want to show
 	$
@@ -434,6 +434,162 @@ In general, we can partition into \textcolor{red}{$\frac{T}{2}$} disjoint pairs 
 $$
 	f_i(C) \neq f_i'(C) \text{\textbf{ if and only if }} c = v_r
 $$
-For such a pair, we have $S_j^{i} = S_{j}^{i'}$
+For such a pair, we have $S_j^{i} = S_{j}^{i'}$. Consequently, we have 
+$$
+	\mathbbm{1}_{A(S_j^i(v_r)) \neq f_i(v_r)} + \mathbbm{1}_{A(S_j^{i'}(v_r)) \neq f_i(v_r)} = \textcolor{red}{1}
+$$
+Rememebering that we had $\frac{1}{T} \sum_{i=1}^{T} \mathbbm{1}_{A(S_j^i(v_r)) \neq f_i(v_r)}$ and now re-writing the sum as a  sum over all disjoint pairs, we get in combination with \textbf{(****)}
+$$
+ \frac{1}{\cancel{T}} \cdot \frac{\cancel{T}}{2} = \frac{1}{2}
+$$
+\textbf{Overall:}
+\begin{align*}
+	\max_{i \in [T]} \ \mathbb{E}_{\mathcal{S} \sim \mathcal{D}_i^m}[L_{\mathcal{D}_i}(A(S))]  &\geq \frac{1}{2} \cdot  \min_{r \in [p]} \underbrace{\frac{1}{T} \sum_{i=1}^{T} \mathbbm{1}_{A(S_j^i(v_r)) \neq f_i(v_r)}}_{\mathclap{ = \frac{1}{2}}}\\
+	&= \frac{1}{2} \cdot \frac{1}{2} = \frac{1}{4}
+\end{align*}
+
+Our earlier steps of fixing indices in the min-operations are irrelevant as we get a constant lower bound!
 \end{proof}
+\paragraph{Corollary:} Let X be an infinitely large domain and let H be the set of \underline{all} functions $X \to \{0,1\}$. Then, H is \underline{not} PAC learnable. (Easy proof by contradiction. Assume it is PAC learnable, then it would have a sample size function. Then we would just have to make the $\varepsilon$ small enough to violate the NFL-theorem) 
+
+\section*{Vapnik-Chervonenkis Dimension (VC Dimension)}
+If we review the proof of the NFL theorem, it seems intuitive to study how a hypothesis class H behaves on C.
+\begin{boxeddef}
+	Let H be a class of functions from $X \to \{0,1\}$ and let $C \subset X, C = \{c_1, ..., c_m \}$. We define 
+	$$ H_C = \{ (h(c_1), ..., h(c_m)): h \in H\} $$
+	as the restriction of H to C.
+\end{boxeddef}
+
+\paragraph{Example:}
+\begin{itemize}
+	\item $C = \{c_1\}, c_1 \in \mathbb{R}$; lets look at the class H of thresholds
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.9\linewidth]{sketch_3}
+		\label{fig:sketch3}
+	\end{figure}
+	$$ H_C = \{(1), (0)\}, |H_C| = 2^1 = 2$$
+	\item $C = \{c_1, c_2\}$
+		$$ H_C = \{(0,0), (0,1), (1,1)\} $$
+\end{itemize}
+
+\begin{boxedsubdef}
+	H \textcolor{red}{shatters} a finite set C of size m, if $|H_C| = 2^m$
+\end{boxedsubdef}
+
+\paragraph{Example:}
+The class of thresholds on $\mathbb{R}$ is PAC learnable.
+\begin{align*}
+	H^{\text{thr}} = \{h_a: a \in \mathbb{R}\}&, h_a: \mathbb{R}\to\{0,1\}\\
+	&x \mapsto h_a(x) &&= \mathbbm{1}_{x<a}\\
+	& &&= \begin{cases}
+		1 , &  \text{if } x<a \\
+		0 , &  \text{else} 
+	\end{cases}
+\end{align*}
+Claim: $H^{\text{thr}}$ is PAC learnable with
+$$
+	m_{H^{\text{thr}}}(\varepsilon, \delta) \leq \left\lceil \log \bigg(\frac{2}{\delta}\bigg) \cdot \frac{1}{\varepsilon}\right\rceil
+$$
+HIER ERGÄNZEN
+
+
+
+Let $\textcolor{blue}{a_0}$ be such that $\mathcal{D}(\{x\in \mathbb{R}: x \in (\textcolor{blue}{a_0}, \textcolor{red}{a^*})\}) = \varepsilon$\\
+Let $\textcolor{blue}{a_1}$ be such that $\mathcal{D}(\{x\in \mathbb{R}: x \in (\textcolor{red}{a^*}, \textcolor{blue}{a_1})\}) = \varepsilon$\\
+\underline{The special cases are:}
+\begin{itemize}
+	\item if $\mathcal{D}(\{x\in \mathbb{R}: x \in (\textcolor{blue}{a_0}, \textcolor{red}{a^*})\}) < \varepsilon$, then set $a_0$ to $-\infty$
+	\item if $\mathcal{D}(\{x\in \mathbb{R}: x \in (\textcolor{red}{a^*}, \textcolor{blue}{a_1})\}) < \varepsilon$, then set $a_1$ to $+\infty$
+\end{itemize}
+We are given $S = \{(x_1, y_1), ..., (x_m, y_m)\}$. An ERM algorithm would be, e.g., 
+\begin{align*}
+	b_0 = \max \{x: (x,1) \in S \}\\
+	b_1 = \min \{x: (x,0) \in S \}
+\end{align*}
+Visually,\\
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\linewidth]{sketch_5}
+	\label{fig:sketch5}
+\end{figure}
+
+so, ERM can choose \underline{any} threshold within $(b_0, b_1)$ (while still having empirical error 0!). Lets denote the threshold of an ERM hypothesis by \colorbox{blue}{\textcolor{white}{$a_S$}} and let $h_S$ be the corresponding hypothesis.\\
+For $h_S$ (with $a_S$ as threshold) to have \colorbox{orange}{$L_{\mathcal{D}, f}(h_S) \leq \varepsilon$}, if suffices that
+\begin{enumerate}
+	\item $b_1 \leq a_1$ AND
+	\item $b_0 \geq a_0$
+\end{enumerate}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{sketch_6}
+	\label{fig:sketch6}
+\end{figure}
+In other words, 
+\begin{align*}
+	\mathbb{P}\big[L_{D,f}(h_s)>\varepsilon\big] &\leq \mathbb{P}\big[(b_0 < a_0) \lor (b_1 > a_1)\big]\\
+	&\leq \mathbb{P}\big[ (b_0<a_0) \big] +\mathbb{P}\big[ (b_1 > a_1) \big]	
+\end{align*}
+So, when does $b_0 < a_0$ happen? When there is no data point in S that is labelled as 1 s.t. $x \in (a_0, a^*)$ (no data point left of perfect threshold).\\
+We do know that $D(\{x \in \mathbb{R}: x\in (a_0, a^{*})\}) = \varepsilon$, hence \underline{not seeing} an instance in that interval $(a_0, a^*)$ has probability of $1-\varepsilon$. Not seeing a data point in $m$ \textit{iid} samples thus has probability of \underline{$(1-\varepsilon)^m \leq e^{-\varepsilon m}$}.\\
+
+$
+	\Rightarrow \mathbb{P}[b_0 < a_0] = (1-\varepsilon)^{m} \leq e^{-\varepsilon m}
+$; some for $\mathbb{P}[b_1>a_1]$.\\
+We get, overall:
+$$
+	\mathbb{P}[L_{\mathcal{D}, f}(h_s)>\varepsilon] \leq \underbrace{2 \cdot e^{-\varepsilon m}}_{\mathclap{\text{we want this to be } <\delta}} \ \ \Rightarrow m > \log\bigg(\frac{2}{\delta}\bigg) \cdot \frac{1}{\varepsilon}
+$$
+
+We have seen that "finiteness" of H ($|H| < \infty$) is \underline{sufficient}, but \underline{not necessary} for PAC learnability!
+
+\begin{boxeddef}[VC-Dimension]
+	The VC-Dimension of H (a class of functions from $X \to \{0,1\}$) is the \textcolor{red}{maximal} size of a set $C \subset X$ that is shattered by H.
+\end{boxeddef}
+
+\paragraph{Theorem:} Let H be a class of functions from $X \to \{ 0,1 \}$. If H has infinite VC-dimension, then H is \underline{not} PAC learnable (without proof, see NFL).
+
+\begin{boxeddef}[growth function]
+	Let H be a class of functions from $X \to \{ 0,1 \}$. The \textcolor{red}{ growth function} of H, $\tau_H: \mathbb{N} \to \mathbb{N}$, is defined as 
+	\begin{align*}		
+		\tau_H (m) = \max_{C \subset X, |C| = m} \big|H_C\big| \hspace{1.5cm} \text{with } \tau_{H}(0)	= 1
+	\end{align*}
+\end{boxeddef}
+
+\paragraph{Remark:} Alternatively, we could define the VC-dim. via $\tau_{H}$:
+$$
+	VC(H) = \max\{m\in\mathbb{N}_0, \tau_{H}(m) = 2^{m}\}
+$$
+
+\paragraph{Lemma (Souer, Shelah, Perez) "Souer's Lemma":} Let H be a hypothesis class of functions from $X \to \{ 0,1 \}$ with \textcolor{red}{$VC(H) \leq d$}. Then
+\begin{align*}
+	\tau_{H}(m) &= 2^{m} &&\text{ if } m \leq \text{\textcolor{red}{$d$}, but}\\
+	\tau_{H}(m) &\leq \left(\frac{e\cdot m}{d}\right)^{d} &&\text{ if } m > \text{\textcolor{red}{$d$}}
+\end{align*}
+without proof!
+
+\paragraph{VC-dimension of \colorbox{orange}{finite} H:} if we take any set C, then its obvious that 
+$$ |H_C| \leq |H|$$
+Hence, if $|H| < 2^m$, then H cannot shatter C of size m!\\
+This implies that 
+$$
+	VC(H) \leq \log_2(|H|)
+$$
+
+\paragraph{Theorem:} Let H be a hyp. class of functions from $X \to \{ 0,1 \}$, and $l: H \times X \times Y \to [0, c], c > 0$, a loss function. For any distribution $\mathcal{D}$ over $X \times Y$ and $\delta \in \{ 0,1 \}$, we have that with probability of at least $1-\delta$ over the choice of $\mathcal{S} \sim \mathcal{D}^{m}$
+$$
+	\forall h \in H: \big| L_\mathcal{D}(h) - L_\mathcal{S}(H)  \big| \leq c \cdot \sqrt{\frac{8 \cdot \log\left(\tau_{H}(2m) \frac{4}{\delta}\right)}{m}}
+$$
+
+\paragraph{\textcolor{red}{Fundamental theorem of statistical learning:}}
+Let H be a hypothesis class of functions from $X \to \{ 0,1 \}$ and let l be the 0-1 loss. Then, the following statements are equivalent:
+\begin{enumerate}
+	\item H has the uniform convergence property
+	\item Any ERM-algorithm is a successful agnostic PAC learner for H
+	\item H is agnostic PAC learnable
+	\item Any ERM algorithm is a successful PAC learner for H
+	\item H is PAC-learnable
+	\item H has finite VC-dimension
+\end{enumerate}
 \end{document}
