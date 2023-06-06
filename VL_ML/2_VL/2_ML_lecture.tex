@@ -564,7 +564,7 @@ $$
 
 \paragraph{Lemma (Souer, Shelah, Perez) "Souer's Lemma":} Let H be a hypothesis class of functions from $X \to \{ 0,1 \}$ with \textcolor{red}{$VC(H) \leq d$}. Then
 \begin{align*}
-	\tau_{H}(m) &= 2^{m} &&\text{ if } m \leq \text{\textcolor{red}{$d$}, but}\\
+	\tau_{H}(m) &= 2^{m} &&\text{ if } m = \text{\textcolor{red}{$d$}, but}\\
 	\tau_{H}(m) &\leq \left(\frac{e\cdot m}{d}\right)^{d} &&\text{ if } m > \text{\textcolor{red}{$d$}}
 \end{align*}
 without proof!
@@ -592,4 +592,102 @@ Let H be a hypothesis class of functions from $X \to \{ 0,1 \}$ and let l be the
 	\item H is PAC-learnable
 	\item H has finite VC-dimension
 \end{enumerate}
+
+END OF CORE LEARNING THEORY PART
+
+\newpage
+
+\part{Linear Predictors}
+We define 
+$$
+	L_d = \{ h_{w,b}: w \in \mathbb{R}^d, b \in \mathbb{R}\} \ \ \ h_{w,b}(x) = \langle w,x \rangle + b
+$$
+as the class of affine functions. From $L_d$ we get different predictors via composition with some 
+\textcolor{red}{$$
+	\mathcal{\phi}: \mathbb{R} \to y
+$$}
+Further, we can use
+\begin{align*}
+	w' &= (b, w_1, ... , w_d)^T \in \mathbb{R}^{d+1}\\
+	x' &= (1, x_1, ... , x_d)^T \in \mathbb{R}^{d+1}
+\end{align*}
+to write 
+$$
+	h_{w,b} (x) = \langle w', x' \rangle
+$$
+
+If $\mathcal{\phi}: \mathbb{R} \to y$ is \textcolor{red}{$\mathcal{\phi} \equiv \text{sign}$}, we get the so called \textcolor{red}{halfspace predictor}:
+$$
+	HS_d = \mathcal{\phi} = L_d = \{ x \mapsto \text{sign}(h_{w,b}(x)): h_{w,b} \in L_d \}
+$$
+
+\textbf{Example: orthogonal Case INSERT HERE}
+
+\paragraph{\underline{Question:}} What is the VC-dimension of
+\begin{align*}
+	&F =  \{ x \mapsto sign(\langle w,x \rangle): w \in \mathbb{R}^d \}\\
+	&VC(F) = ?
+\end{align*}
+\underline{Claim:} $VC(F) = \textcolor{red}{d}$\\
+
+\underline{1. We show that $VC(F)\geq d$ (lower bound):}\\
+	$X = \{ c_1, ..., c_d \}$ with $c_i \in \mathbb{R}^d$ for all $i \in \{ 1, ..., d \}$\\
+	$c_1 = \left(\begin{array}{c} 1 \\ 0 \\ ... \\ 0 \end{array}\right)$,
+	$c_2 = \left(\begin{array}{c} 0 \\ 1 \\ ... \\ 0 \end{array}\right)$,
+	..., 
+	$c_d = \left(\begin{array}{c} 0 \\ 0 \\ ... \\ d \end{array}\right)$\\
+	\\
+	Let 
+	$w = \left(\begin{array}{c} 
+		y_1 \\
+		 ... \\
+		 y_d \end{array}\right)
+		 \begin{array}{c} 
+		 	\textcolor{blue}{\text{ (label of 1st point)}}  \\
+		 	... \\
+		 	\textcolor{blue}{\text{ (label of dth point)}}  
+		 \end{array}$ 
+	for any given labeling $\{ \pm 1 \}$ of $\{ c_1, ..., c_d \}$\\
+	
+	\underline{Notation} \textbf{hier ergänzen}
+	
+	$$
+		\langle w, c_i \rangle = \sum_{j=1}^{d} w_j \cdot c_{ij} = 1 \cdot w_i = y_i 
+	$$
+	
+	$\Rightarrow VC(F) \geq d$ (as we have found a set of size d that is shattered).\\
+	
+
+\underline{2. We will show the upper-bound $VC(F) < d+1$ via contradiction:}
+	\\
+
+	\textcolor{red}{
+		Assume that $d+1$ points $X = \{ c_1, ..., c_{d+1} \}$ are shattered by F.}
+	
+	This means that $\exists w_1, ..., w_{2^d+1}$ weight vectors that realize all $2^{d+1}$ labellings of the $d+1$ points. \\
+	Getting all possible labellings would look like this
+	MATRIX KORRIGIEREN!  https://tex.stackexchange.com/questions/38833/diagonal-dots-spanning-multiple-lines-columns-of-a-matrix/38878
+	$$
+	M = \left(\begin{array}{cccc}
+		w_1^T \cdot c_1 & w_2^T \cdot c_1 & ... & w_{2^{d+1}}^T \cdot c_1 \\
+		w_2^T \cdot c_1 & w_2^T \cdot c_1 & ... & w_{2^{d+1}}^T \cdot c_1 \\
+		w_3^T \cdot c_1 & w_2^T \cdot c_1 & ... & w_{2^{d+1}}^T \cdot c_1 \\
+		... &   &   &  ... \\
+		w_1^T \cdot c_{d+1} & w_2^T \cdot c_1 & ... & w_{2^{d+1}}^T \cdot c_1 \end{array}\right)
+	$$
+	
+	We can also write this as $XW$:
+	$$
+		X = \left(\begin{array}{c}
+			c_1 \\ c_2\\ ...\\ c_{d+1}
+		\end{array}\right), 
+		W = \left(\begin{array}{cccc}
+			... & ... & ... & ...\\
+			w_1 & w_2 & ... & w_{2^{d+1}}\\
+			... & ... & ... & ...
+		\end{array}\right)
+	$$
+	Taking $sign(XW)$ componentwise givs all possible labellings. Let \textcolor{red}{$M = XW$}.\\
+	We know that $rank(M) \leq \min\{ rank(X), rank(W) \}$ (by virtue of $rank(\cdot)$)
+
 \end{document}
