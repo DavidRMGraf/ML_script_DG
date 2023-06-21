@@ -161,7 +161,7 @@ This leads to:
 	\begin{enumerate}
 		\item for every $\varepsilon, \delta \in (0,1)$ and
 		\item every distribution $\mathcal{D}$ over domain $\mathcal{X}$ and
-		\item every labelling function $f: X \to \{0, 1\}$ if
+		\item every labelling function $f: \mathcal{X} \to \{0, 1\}$ if
 		\item realizability holds (w.r.t. to $\mathcal{D}, H, f$) then
 	\end{enumerate}
 	running $\mathcal{A}$ on $m \geq m_H(\varepsilon, \delta)$ \textit{iid.} instances drawn from $\mathcal{D}$ and labelled by $f$, returns a hypothesis $h$ such that with probability of at least $1-\delta$ (over choice of S) 
@@ -621,7 +621,12 @@ $$
 	HS_d = \mathcal{\phi} = L_d = \{ x \mapsto \text{sign}(h_{w,b}(x)): h_{w,b} \in L_d \}
 $$
 
-\textbf{Example: orthogonal Case INSERT HERE}
+\underline{Example: orthogonal case}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{sketch_7}
+	\label{fig:sketch7}
+\end{figure}
 
 \paragraph{\underline{Question:}} What is the VC-dimension of
 \begin{align*}
@@ -632,19 +637,19 @@ $$
 
 \underline{1. We show that $VC(F)\geq d$ (lower bound):}\\
 	$X = \{ c_1, ..., c_d \}$ with $c_i \in \mathbb{R}^d$ for all $i \in \{ 1, ..., d \}$\\
-	$c_1 = \left(\begin{array}{c} 1 \\ 0 \\ ... \\ 0 \end{array}\right)$,
-	$c_2 = \left(\begin{array}{c} 0 \\ 1 \\ ... \\ 0 \end{array}\right)$,
-	..., 
-	$c_d = \left(\begin{array}{c} 0 \\ 0 \\ ... \\ d \end{array}\right)$\\
+	$c_1 = \left(\begin{array}{c} 1 \\ 0 \\ \vdots \\ 0 \end{array}\right)$,
+	$c_2 = \left(\begin{array}{c} 0 \\ 1 \\ \vdots \\ 0 \end{array}\right)$,
+	$\hdots$, 
+	$c_d = \left(\begin{array}{c} 0 \\ 0 \\ \vdots \\ d \end{array}\right)$\\
 	\\
 	Let 
 	$w = \left(\begin{array}{c} 
 		y_1 \\
-		 ... \\
+		 \vdots \\
 		 y_d \end{array}\right)
 		 \begin{array}{c} 
 		 	\textcolor{blue}{\text{ (label of 1st point)}}  \\
-		 	... \\
+		 	\vdots \\
 		 	\textcolor{blue}{\text{ (label of dth point)}}  
 		 \end{array}$ 
 	for any given labeling $\{ \pm 1 \}$ of $\{ c_1, ..., c_d \}$\\
@@ -660,10 +665,9 @@ $$
 
 \underline{2. We will show the upper-bound $VC(F) < d+1$ via contradiction:}
 	\\
-
 	\textcolor{red}{
-		Assume that $d+1$ points $X = \{ c_1, ..., c_{d+1} \}$ are shattered by F.}
-	
+		Assume that $d+1$ points $$X = \{ c_1, ..., c_{d+1} \}$$ are shattered by F.}\\
+			
 	This means that $\exists w_1, ..., w_{2^d+1}$ weight vectors that realize all $2^{d+1}$ labellings of the $d+1$ points. \\
 	Getting all possible labellings would look like this
 	MATRIX KORRIGIEREN!  https://tex.stackexchange.com/questions/38833/diagonal-dots-spanning-multiple-lines-columns-of-a-matrix/38878
@@ -678,16 +682,169 @@ $$
 	
 	We can also write this as $XW$:
 	$$
-		X = \left(\begin{array}{c}
-			c_1 \\ c_2\\ ...\\ c_{d+1}
+		X = \left(\begin{array}{ccc}
+			\hdots & c_1 & \hdots \\
+			 \hdots & c_2 & \hdots\\
+			 \vdots & \vdots & \vdots \\
+			\hdots & c_1 & \hdots
 		\end{array}\right), 
 		W = \left(\begin{array}{cccc}
-			... & ... & ... & ...\\
-			w_1 & w_2 & ... & w_{2^{d+1}}\\
-			... & ... & ... & ...
+			\vdots & \vdots & \vdots & \vdots \\
+			w_1 & w_2 & \hdots & w_{2^{d+1}}\\
+			\vdots & \vdots & \vdots & \vdots
 		\end{array}\right)
 	$$
-	Taking $sign(XW)$ componentwise givs all possible labellings. Let \textcolor{red}{$M = XW$}.\\
-	We know that $rank(M) \leq \min\{ rank(X), rank(W) \}$ (by virtue of $rank(\cdot)$)
+	Taking $\text{sign}(XW)$ componentwise givs all possible labellings. Let \textcolor{red}{$M = XW$}.\\
+	We know that $rank(M) \leq \min\{ \text{rank}(X), \text{rank}(W) \} \textcolor{red}{= d}$ (by virtue of $\text{rank}(\cdot)$)
+	
+ \paragraph{Claim:} Under the shattering assumption, the rows of M are linearly independent!
+ $$ \alpha_1 v_1 + \hdots + \alpha_n v_n = \vec{0}$$
+ \newline
+ \textcolor{red}{ Hier Matrix M nochmal einfügen}
+ \newline
+\begin{align*}
+a_1 \cdot \text{row}_1 + \hdots + a_n \cdot \text{row}_n &=\\
+a_1 \cdot ( w_1^T \cdot c_1, w_2^T\cdot c_1, \hdots, w_{2^{d+1}}^T\cdot c_1 ) &+\\
+a_2 \cdot ( w_1^T\cdot c_2, w_2^T\cdot c_2, \hdots, w_{2^{d+1}}^T\cdot c_2 ) &+\\
+\hdots &+\\
+a_{d+1} \cdot ( w_1^T \cdot c_{d+1}, w_2^T\cdot c_{d+1}, \hdots, w_{2^{d+1}}^T\cdot c_{d+1} ) &=
+\end{align*}
+
+\begin{align*}
+	\vec{x} = (a^T X w_1, a^T X w_2, \hdots, a^T X w_{2^{d+1}}) \textcolor{red}{=^? \vec{0}}
+\end{align*}
+\textcolor{red}{hier einfügen}
+\newline
+Fact is, due to the shattering assumption, there is a \textcolor{red}{k} such that
+
+$$
+	\text{sign}(a) = \text{sign}(Xw_{\textcolor{red}{k}})
+$$
+$$
+\Rightarrow a^T X w_{\textcolor{red}{k}} \text{ is positive}
+$$
+$\Rightarrow$ The all zeros vector can only be achieved if all $a_i$ are 0\\
+$\Rightarrow$ we have d+1 independent rows $\Rightarrow \text{rank}(M) = d+1$\\
+BUT, $\text{rank}(M) \leq d$! $\Rightarrow$ Contradiction (meaning our assumption is wrong). Consequently, $VC(F) < d+1$ and with $VC(F) \leq d$ we obtain $$\textcolor{red}{VC(F) = d}$$
+
+
+\paragraph{Example:} Learning halfspace classifiers\\
+$$\text{HS}_d = \{ x \mapsto h_{w,b}(x), h_{w,b} \in L_d \}$$
+we are only looking at the \underline{realizable case}.
+$$S = ((x_1, y_1), ..., (x_m, y_m));\  \ y_i \in {\pm 1}$$
+
+ERM on $\text{HS}_d$ means to find \textcolor{blue}{$w \in \mathbb{R}^{d}$}, such that 
+$$
+\forall i \in \{ 1, ..., m \}: \text{sign}(\langle \textcolor{blue}{w}, x_i\rangle) = y_i
+$$
+or equivalently 
+$$
+y_i =  \langle \textcolor{blue}{w}, x_i\rangle > 0 \forall i \in \{ 1, ..., m \}
+$$
+
+\textcolor{red}{hier Bild einfügen}
+
+Letting $$\overline{w} =  \frac{w^*}{\gamma}$$ we have 
+$$
+	\forall i \in \{ 1, ..., m \}: y_i \langle \overline{w}, x_i\rangle = y_i \langle \frac{w^*}{\gamma}, x_i \rangle = \frac{1}{\gamma} \cdot y_i \langle w^*, x_i \rangle \geq 1
+$$
+
+This shows that a vector $w \in \mathbb{R}^{d}$ with
+$$
+	\forall i: y_i \langle w, x_i \rangle \text{ has to exist! (**)}
+$$
+
+We can write (**) as \textcolor{blue}{$Aw \geq v$} with \\
+\textcolor{red}{ matrix hier einfügen}\\
+A \underline{linear program} (LP) is
+$$
+	\underbrace{\max_{w \in \mathbb{R}^{d}} \langle u, w \rangle}_{\text{\textcolor{blue}{linear objective}}} \text{ subject to } 
+	\underbrace{Aw \geq v}_{\textcolor{blue}{\text{linear constraints}}}
+$$ 
+Take $u \in \mathbb{R}^{d}$ as, e.g., $u = (1, \hdots, 1)^T$ 
+
+\part{Rademacher Complexity}
+In short: RC is the ability of a class to correlate well with random noise.\\
+RC can be bounded by the growth function or the VC-dim bounds. RC can be tighter than the VC-dim. bounds!\\
+\underline{Conventions:} $H$, a hypothesis class; $l: H\times Z \to \mathbb{R}$, a loss function; to each $h \in H$, we associate a function g ($ g \in G$) that maps $(x,y) \mapsto l(h, (x,y)) $ (i.e. tuple x,y is mapped to its loss).\\
+\newline
+E.g.: $G = \{ (x,y) \mapsto \underbrace{\mathbbm{1}_{h(x) \neq y}}_{\text{0-1 loss}}: h\in H \}$
+
+\begin{boxeddef}[Empirical Rademacher complexity]
+	Let $G$ be a class of functions from $Z = X \times Y$ to $[a, b]$ and $\mathbb{S} = (z_1, ..., z_n)$ with $z_i \in Z$. Then, the empirical Rademacher complexity is defined as:
+	$$
+		\hat{R_s}(G) = \mathbb{E}_\sigma\bigg[\sup_{g \in G} \frac{1}{m} \cdot \sum_{i = 1}^{m} \sigma_i g(z_i)\bigg]
+	$$
+	with $\sigma = (\sigma_1, ..., \sigma_m)^T$, $\sigma_i \sim^{iid} \text{ uniform}\left(\{ \pm 1 \}\right)$
+\end{boxeddef}
+
+\begin{boxeddef}[Rademacher complexity]
+	Let $\mathcal{D}$ be a distribution over $Z = X \times Y$. For any $m \geq 1$, the Rademacher complexity of G is defined as
+	$$
+		R_m(G) = \mathbb{E}_{S \sim \mathcal{D}^m} \big[\hat{R_s}(G)\big]
+	$$
+\end{boxeddef}
+
+\paragraph{Theorem:} Let G be a class of functions from $Z$ to $[0,1]$. For any $\delta > 0$, we have with probability of at least $1-\delta$, that (1) and (2) hold for all $g \in G$:
+\begin{enumerate}
+	\item $\mathbb{E}_z \big[g(z)\big] \leq \frac{1}{m} \cdot \sum_{i = 1}^{m} g(z_i) + 2 R_m (G) + \sqrt{\frac{\log(\frac{1}{\delta})}{2m}}$
+	\item $\mathbb{E}_z \big[g(z)\big] \leq \frac{1}{m} \cdot \sum_{i = 1}^{m} g(z_i) + 2 \hat{R_s} (G) + 3 \cdot \sqrt{\frac{\log(\frac{2}{\delta})}{2m}}$
+\end{enumerate}
+\textcolor{blue}{(2) is a "data-dependent" bound (via S)!}
+\begin{proof}
+	For any $S = (z_1, ..., z_m)$ and any $g \in G$, let
+	$$
+		\hat{\mathbb{E}_s}[g] = \frac{1}{m} \sum_{i = 1}^{m} g(z_i)
+	$$
+	Let \textcolor{blue}{$$\phi(s) = \sup_{g \in G} \mathbb{E}[g] - \hat{\mathbb{E}_S}[g]$$}. Also, let $S, S'$ be \underline{two} samples that only differ in one instance, e.g. $z_i$ in $S$ and $z_{i}'$ in $S'$.
+	\begin{align*}
+		\phi(S')-\phi(S) &= \sup_{g \in G} \mathbb{E}[g] - \hat{\mathbb{E}_S'}[g] - sup_{g \in G} \mathbb{E}[g] - \hat{\mathbb{E}_S}[g]\\
+		&\leq  \sup_{g \in G} \hat{\mathbb{E}_{\textcolor{blue}{S}}}[g] - \sup_{g \in G} \hat{\mathbb{E}_{\textcolor{red}{S'}}}[g]\\
+		&= \sup_{g \in G} \frac{g(z_i) - g(z_{i}')}{m} \leq \frac{1}{m}
+	\end{align*}
+	\colorbox{orange}{hier ergänzen}
+\end{proof}
+
+\begin{boxeddef}[McDiarmid inequality]
+	Let $X_1, ..., X_m$ be $m \geq 1$ independent random variables and assume that there exist $c_y, ..., c_m > 0$ such that $f: \mathcal{X}^m \to \mathbb{R}$ satisfies:
+	$$
+		\bigg|f(x_1, \hdots , x_i, \hdots, x_m) - f(x_1, \hdots, x_{i}', \hdots, x_m) \bigg| \leq c_i \ \ \forall i \in \{ 1, ..., m \}
+	$$
+	Remark: $\mathcal{X}^m = \underbrace{\mathcal{X} \times \mathcal{X} \times ... \times \mathcal{X}}_{\text{m-times}}$\\
+	
+	for any $x_1, ..., x_m, x_{i}' \in \mathcal{X}$. Let $f(S)$ denote $f(X_1, ..., X_m)$. Then, for all $\varepsilon > 0$:
+	\begin{enumerate}
+		\item $\mathbb{P}[f(s) - \mathbb{E}[f(S)] \geq \varepsilon] \exp (\frac{-2\varepsilon^2}{})$
+		\colorbox{orange}{hier ergänzen}
+	\end{enumerate}
+\end{boxeddef}
+
+	By McDiarmid's inequality, we have (with $c_i = \frac{1}{m}$)
+	$$
+		\mathbb{P}[\phi(S) - \mathbb{E}[\phi(S)] \geq \varepsilon] \leq \underbrace{\exp \bigg(\frac{-2\varepsilon^2}{\sum_{i} \frac{1}{m^2} }\bigg)}_{\text{let this be $<\delta$ and express $\varepsilon > \sqrt{ \frac{\log(\frac{1}{\delta})}{2m} }$}}
+	$$
+	$$
+	\Rightarrow \phi(S) - \mathbb{E}_S[\phi(S)] \leq \sqrt{\frac{1}{2m} \cdot \log(\frac{1}{\delta})}
+	$$
+	holds with probability of at least $1-\delta$.\\
+	OR\\
+	$$
+		\phi(S) \leq \mathbb{E}_s[\phi(S)] + \sqrt{\frac{1}{2m} \cdot \log(\frac{1}{\delta})}
+	$$
+	Now look at that first term:
+\begin{align*}
+		\mathbb{E}_s[\phi(S)] &= \mathbb{E}_s \big[\sup_{g \in G} \mathbb{E}[g] - \hat{\mathbb{E}_{S}}[g]\big]\\
+		&\ \ \ \text{with: } \mathbb{E}_{S'}[\hat{\mathbb{E}_{S'} [g]}] = \mathbb{E}[g]\\
+		&= \mathbb{E}_S \bigg[ \sup_{g \in G} \mathbb{E}_{S'} \big[  \hat{\mathbb{E}_{S'}} [g] - \hat{\mathbb{E}_{S}} [g] \big] \bigg]\\
+		&\leq \mathbb{E}_{S,S'} \bigg[ \mathbb{E}_{S'} \sup_{g \in G}\big(  \hat{\mathbb{E}_{S'}} [g] - \hat{\mathbb{E}_{S}} [g]\big) \bigg]\\
+		&= \mathbb{E}_{S,S'}\bigg[ \sup_{g \in G} \bigg( \frac{1}{m} \cdot \sum_{i_1}^{m} g(z_{i}') - g(z_i)\bigg) \bigg]\\
+		&= \mathbb{E} \bigg[ \sup_{g \in G} \bigg( \frac{1}{m} \cdot \sum_{i_1}^{m} \sigma_i \big( g(z_{i}') - g(z_i) \big)  \bigg)  \bigg]\\
+		& \text{Remark: We know $ \sup(A+B) \leq \sup(A) + \sup(B)$}\\
+		&= \mathbb{E}_{\sigma, S, S'}\bigg[ \sup_{g \in G} \bigg( \frac{1}{m} \cdot \sum_{i_1}^{m} \sigma_i  g(z_{i}')  + \frac{1}{m} \cdot \sum_{i_1}^{m} \sigma_i \cdot -g(z_{i})  \bigg)  \bigg]\\
+		&\leq \mathbb{E}_{\sigma, S'}\bigg[ \sup_{g \in G} \bigg( \frac{1}{m} \cdot \sum_{i_1}^{m} \sigma_i g(z_{i}') \bigg) \bigg] +
+		\mathbb{E}_{\sigma, S}\bigg[ \sup_{g \in G} \bigg( \frac{1}{m} \cdot \sum_{i_1}^{m} -\sigma_i g(z_{i})  \bigg) \bigg]\\
+		&= \textcolor{red}{2} \cdot \mathbb{E}_{\sigma, S}\bigg[ \sup_{g \in G} \bigg( \frac{1}{m} \cdot \sum_{i_1}^{m} \sigma_i \cdot g(z_{i})  \bigg) \bigg] \\
+		&= 2 \cdot R_m(G)
+\end{align*}
 
 \end{document}
