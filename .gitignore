@@ -1,5 +1,7 @@
 # ignore repo from Prof. Kwitt
 slides/
+# ignore exam prep
+exam_prep/
 #ignore pdfs in VL slides
 VL_ML/**/*.pdf
 # ignore PS everything
